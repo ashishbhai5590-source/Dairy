@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Study Task Challenge</title>
+
+  <style>
+    /* ─────────────────────────────────────────────────────────
+       COLORFUL, BRIGHT & ENERGETIC THEME
+       ───────────────────────────────────────────────────────── */
+    :root {
+      --primary: #4f46e5;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(255, 255, 255, 0.95);
+      --shadow-soft: 0 10px 25px -5px rgba(99, 102, 241, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      --shadow-elevated: 0 20px 35px -8px rgba(99, 102, 241, 0.22);
+
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --radius-md: 18px;
+      --radius-lg: 26px;
+      --radius-pill: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 90px;
+      background: linear-gradient(135deg, #fdf4ff 0%, #ede9fe 25%, #e0f2fe 55%, #fef3c7 85%, #ffe4e6 100%);
+      background-attachment: fixed;
+    }
+
+    input, select { user-select: text; }
+
+    header.app-header {
+      padding: 20px 20px 14px 20px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #4f46e5 0%, #db2777 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: #ffffff;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+    }
+
+    .notif-banner {
+      margin: 14px 16px 6px 16px;
+      background: #ffffff;
+      border: 1.5px solid #fbcfe8;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-soft);
+      gap: 8px;
+    }
+
+    .btn-test-notif {
+      background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+      color: #ffffff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .main-container {
+      padding: 12px 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin: 10px 0 12px 2px;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .task-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .task-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: #6366f1;
+    }
+    .task-card.active-card::before { background: #3b82f6; }
+    .task-card.completed-card::before { background: #10b981; }
+    .task-card.rejected-card::before { background: #ef4444; }
+
+    .subject-pill {
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      background: #f1f5f9;
+      display: inline-block;
+    }
+
+    .task-status-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+    .tag-upcoming { background: #f1f5f9; color: #64748b; }
+    .tag-active { background: #dbeafe; color: #1d4ed8; }
+    .tag-completed { background: #dcfce7; color: #15803d; }
+    .tag-rejected { background: #fee2e2; color: #b91c1c; }
+
+    .task-topic {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .task-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-retry {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Active Timer Screen */
+    .timer-screen-card {
+      background: #ffffff;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 32px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-elevated);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timer-display-box {
+      font-size: 4.6rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: #1e1b4b;
+      margin: 20px 0;
+    }
+
+    .timer-button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .btn-pause {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-finish {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Challenge Popup */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out;
+    }
+
+    .modal-backdrop.show { opacity: 1; pointer-events: auto; }
+
+    .challenge-card {
+      background: #ffffff;
+      border: 2px solid #818cf8;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 350px;
+      padding: 26px 20px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-accept {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #ffffff;
+      border: none;
+      padding: 15px;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .btn-reject {
+      background: #f8fafc;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    /* Modal Form */
+    .form-sheet {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 800; color: #475569; margin-bottom: 6px; }
+    .form-input, .form-select {
+      width: 100%;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .floating-add-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: linear-gradient(135deg, #4f46e5 0%, #db2777 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px 22px;
+      border-radius: var(--radius-pill);
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(219, 39, 119, 0.35);
+      cursor: pointer;
+      z-index: 90;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 65px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .nav-btn.active { color: #4f46e5; }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand-title">⚡ Study Challenge</div>
+    <span class="header-badge" id="taskStatsPill">0 Tasks</span>
+  </header>
+
+  <!-- Test Ribbon -->
+  <div class="notif-banner">
+    <div style="font-size: 0.8rem; font-weight: 700; color: #831843;">
+      🔔 <strong>नोटिफिकेशन बार टेस्ट:</strong> 5 सेकंड में ऊपर Accept/Reject बटन आएगा!
+    </div>
+    <button class="btn-test-notif" onclick="scheduleTestAlert()">⚡ Test (5s)</button>
+  </div>
+
+  <main class="main-container">
+    <div id="tab-tasks">
+      <div class="section-title">🎯 Today's Study Tasks</div>
+      <div class="task-list" id="taskListContainer"></div>
+    </div>
+
+    <div id="tab-timer" style="display: none;">
+      <div class="timer-screen-card" id="timerScreenCard"></div>
+    </div>
+  </main>
+
+  <button class="floating-add-btn" id="floatingAddBtn" onclick="openAddTaskModal()">
+    <span>➕</span> Add Task
+  </button>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="navBtnTasks" onclick="switchTab('tasks')">
+      <span style="font-size: 1.25rem;">📚</span> Tasks
+    </button>
+    <button class="nav-btn" id="navBtnTimer" onclick="switchTab('timer')">
+      <span style="font-size: 1.25rem;">⏱️</span> Active Timer
+    </button>
+  </nav>
+
+  <!-- Modal: Add Task -->
+  <div class="modal-backdrop" id="addTaskModal">
+    <div class="form-sheet">
+      <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 14px;">✨ New Study Task</h3>
+      <form onsubmit="handleCreateTask(event)">
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select class="form-select" id="formSubject">
+            <option value="📘 Biology">📘 Biology</option>
+            <option value="⚗️ Chemistry">⚗️ Chemistry</option>
+            <option value="📐 Mathematics">📐 Mathematics</option>
+            <option value="⚡ Physics">⚡ Physics</option>
+            <option value="📚 English">📚 English</option>
+            <option value="📙 Hindi">📙 Hindi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Topic Name</label>
+          <input type="text" class="form-input" id="formTopic" placeholder="e.g. Human Reproduction" required />
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" class="form-group">
+          <div>
+            <label class="form-label">Start Time</label>
+            <input type="time" class="form-input" id="formStartTime" required />
+          </div>
+          <div>
+            <label class="form-label">End Time</label>
+            <input type="time" class="form-input" id="formEndTime" required />
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 14px;">
+          <button type="button" class="form-input" style="width: 35%; cursor: pointer;" onclick="closeAddTaskModal()">Cancel</button>
+          <button type="submit" class="btn-accept" style="width: 65%;">Set Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Challenge Popup -->
+  <div class="modal-backdrop" id="challengeModal">
+    <div class="challenge-card">
+      <div style="font-size: 0.8rem; font-weight: 900; color: #4f46e5; margin-bottom: 8px;">🔔 STUDY TIME CHALLENGE</div>
+      <div style="font-size: 1.35rem; font-weight: 900;" id="popSubject">📘 Biology</div>
+      <div style="font-size: 1.1rem; color: #64748b; margin: 4px 0 10px 0;" id="popTopic">Human Reproduction</div>
+      <div style="font-size: 0.85rem; font-weight: 800; color: #b45309; margin-bottom: 20px;" id="popTimeRange">7:00 PM — 8:00 PM</div>
+      <button class="btn-accept" onclick="acceptStudyChallenge()">🚀 ACCEPT CHALLENGE</button>
+      <button class="btn-reject" onclick="rejectStudyChallenge()">❌ REJECT</button>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       1. WEB AUDIO SYNTHESIZER
+       ========================================================= */
+    class SoundEngine {
+      constructor() { this.ctx = null; }
+      init() {
+        if (!this.ctx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) this.ctx = new AC();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      playTone(freq, dur, type = 'sine', delay = 0) {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + delay);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + delay + dur);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + delay);
+          osc.stop(this.ctx.currentTime + delay + dur);
+        } catch(e) {}
+      }
+      playChime() {
+        this.playTone(587.33, 0.2, 'sine', 0);
+        this.playTone(880.00, 0.45, 'triangle', 0.1);
+      }
+      playAccept() {
+        this.playTone(523.25, 0.15, 'sine', 0);
+        this.playTone(659.25, 0.25, 'triangle', 0.1);
+      }
+      playReject() {
+        this.playTone(260, 0.15, 'triangle', 0);
+        this.playTone(200, 0.25, 'triangle', 0.1);
+      }
+      playComplete() {
+        this.playTone(523.25, 0.15, 'sine', 0);
+        this.playTone(659.25, 0.15, 'sine', 0.1);
+        this.playTone(783.99, 0.15, 'sine', 0.2);
+        this.playTone(1046.50, 0.5, 'triangle', 0.3);
+      }
+    }
+    const audio = new SoundEngine();
+
+    /* =========================================================
+       2. STATE & SERVICE WORKER REGISTRATION
+       ========================================================= */
+    const STORAGE_KEY = 'study_colorful_tasks_v2';
+    let appState = {
+      tasks: [],
+      activeChallenge: null
+    };
+
+    let swReg = null;
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        swReg = reg;
+      }).catch(err => console.log('SW registration note:', err));
+
+      // Listen for button clicks from the Android Notification Drawer
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'NOTIFICATION_ACTION') {
+          const { action, taskId } = event.data;
+          if (action === 'accept') {
+            currentTriggeredTask = appState.tasks.find(t => t.id === taskId);
+            acceptStudyChallenge();
+          } else if (action === 'reject') {
+            currentTriggeredTask = appState.tasks.find(t => t.id === taskId);
+            rejectStudyChallenge();
+          } else {
+            triggerChallengePopup(taskId);
+          }
+        }
+      });
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) appState = Object.assign(appState, JSON.parse(raw));
+      } catch (e) {}
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {}
+    }
+
+    /* =========================================================
+       3. NOTIFICATION TRIGGER WITH ACTION BUTTONS
+       ========================================================= */
+    async function ensureNotificationPermission() {
+      if ('Notification' in window && Notification.permission !== 'granted') {
+        await Notification.requestPermission();
+      }
+    }
+
+    function sendActionableNotification(title, body, taskId) {
+      // 1. If Service Worker is ready, use it to get REAL BUTTONS in notification bar
+      if (swReg && 'showNotification' in swReg) {
+        swReg.showNotification(title, {
+          body: body,
+          data: { taskId: taskId },
+          tag: `task-${taskId}`,
+          renotify: true,
+          requireInteraction: true,
+          actions: [
+            { action: 'accept', title: '🚀 Accept' },
+            { action: 'reject', title: '❌ Reject' }
+          ]
+        });
+      } 
+      // 2. Clean fallback with clean text (NO broken SVG icon)
+      else if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: body });
+      }
+    }
+
+    // 5-Second Test Button
+    function scheduleTestAlert() {
+      audio.init();
+      ensureNotificationPermission();
+      alert("5 सेकंड का टाइमर शुरू!\n\nअभी होम बटन दबाकर रील्स या दूसरा ऐप खोलें। 5 सेकंड में ऊपर नोटिफिकेशन आएगा, उसे नीचे खींचेंगे तो [Accept] और [Reject] दोनों बटन दिखेंगे!");
+      
+      setTimeout(() => {
+        audio.playChime();
+        sendActionableNotification(
+          "🔔 STUDY TIME: Biology",
+          "Human Reproduction (7:00 PM — 8:00 PM)\nक्या आप तैयार हैं?",
+          "test-task"
+        );
+      }, 5000);
+    }
+
+    /* =========================================================
+       4. TIME HELPERS
+       ========================================================= */
+    function formatTime12(time24) {
+      if (!time24) return '';
+      const [h, m] = time24.split(':').map(Number);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+
+    function parseTodayTimestamp(time24) {
+      const [hours, minutes] = time24.split(':').map(Number);
+      const d = new Date();
+      d.setHours(hours, minutes, 0, 0);
+      return d.getTime();
+    }
+
+    function getMinutesBetween(startTime24, endTime24) {
+      const s = parseTodayTimestamp(startTime24);
+      let e = parseTodayTimestamp(endTime24);
+      if (e <= s) e += 24 * 60 * 60 * 1000;
+      return Math.round((e - s) / 60000);
+    }
+
+    /* =========================================================
+       5. TASK SCHEDULE MONITOR & CHALLENGE
+       ========================================================= */
+    let currentTriggeredTask = null;
+
+    function checkScheduledTasks() {
+      const now = Date.now();
+      appState.tasks.forEach(task => {
+        if (task.status === 'UPCOMING') {
+          const startMs = parseTodayTimestamp(task.startTime);
+          if (now >= startMs && (now - startMs) < 4 * 60 * 60 * 1000) {
+            triggerChallengePopup(task.id);
+          }
+        }
+      });
+    }
+
+    function triggerChallengePopup(taskId) {
+      const task = appState.tasks.find(t => t.id === taskId);
+      if (!task || task.status === 'ACTIVE' || task.status === 'COMPLETED') return;
+
+      currentTriggeredTask = task;
+      document.getElementById('popSubject').textContent = task.subject;
+      document.getElementById('popTopic').textContent = task.topic;
+      document.getElementById('popTimeRange').textContent = `${formatTime12(task.startTime)} — ${formatTime12(task.endTime)}`;
+
+      audio.playChime();
+
+      // Show actionable notification in upper notification drawer
+      sendActionableNotification(
+        `🔔 STUDY TIME: ${task.subject}`,
+        `${task.topic} (${formatTime12(task.startTime)} — ${formatTime12(task.endTime)})\nक्या आप पढ़ने के लिए तैयार हैं?`,
+        task.id
+      );
+
+      document.getElementById('challengeModal').classList.add('show');
+    }
+
+    function acceptStudyChallenge() {
+      if (!currentTriggeredTask) return;
+      const task = currentTriggeredTask;
+
+      document.getElementById('challengeModal').classList.remove('show');
+      task.status = 'ACTIVE';
+
+      const durationMins = getMinutesBetween(task.startTime, task.endTime);
+      appState.activeChallenge = {
+        taskId: task.id,
+        targetEndMs: Date.now() + durationMins * 60 * 1000,
+        originalMins: durationMins,
+        isPaused: false,
+        pausedRemainingMs: null
+      };
+
+      saveState();
+      renderTasks();
+      audio.playAccept();
+      switchTab('timer');
+    }
+
+    function rejectStudyChallenge() {
+      if (!currentTriggeredTask) return;
+      currentTriggeredTask.status = 'REJECTED';
+      document.getElementById('challengeModal').classList.remove('show');
+      saveState();
+      renderTasks();
+      audio.playReject();
+      currentTriggeredTask = null;
+    }
+
+    function retryTask(taskId) {
+      const task = appState.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.status = 'UPCOMING';
+        saveState();
+        renderTasks();
+        triggerChallengePopup(taskId);
+      }
+    }
+
+    /* =========================================================
+       6. ACTIVE COUNTDOWN TIMER
+       ========================================================= */
+    let timerLoop = null;
+
+    function startTimerTick() {
+      if (timerLoop) clearInterval(timerLoop);
+      timerLoop = setInterval(() => {
+        if (!appState.activeChallenge) {
+          renderTimerView();
+          return;
+        }
+
+        const active = appState.activeChallenge;
+        if (active.isPaused) {
+          renderTimerView();
+          return;
+        }
+
+        const remainingMs = active.targetEndMs - Date.now();
+        if (remainingMs <= 0) {
+          finishActiveStudy();
+        } else {
+          renderTimerView();
+        }
+      }, 500);
+    }
+
+    function renderTimerView() {
+      const container = document.getElementById('timerScreenCard');
+      if (!appState.activeChallenge) {
+        container.innerHTML = `
+          <div style="font-size: 3rem; margin-bottom: 8px;">⏳</div>
+          <div style="font-size: 1.1rem; font-weight: 800; color: #334155;">No Active Challenge</div>
+          <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">Accept a task from the list to start your countdown!</div>
+        `;
+        return;
+      }
+
+      const active = appState.activeChallenge;
+      const task = appState.tasks.find(t => t.id === active.taskId);
+      if (!task) {
+        appState.activeChallenge = null;
+        saveState();
+        return;
+      }
+
+      const remainingMs = active.isPaused 
+        ? active.pausedRemainingMs 
+        : Math.max(0, active.targetEndMs - Date.now());
+
+      const totalSec = Math.floor(remainingMs / 1000);
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      container.innerHTML = `
+        <span class="subject-pill">${task.subject}</span>
+        <div style="font-size:1.35rem; font-weight:900; margin-top:8px;">${escapeHtml(task.topic)}</div>
+        <div style="font-size:0.85rem; font-weight:700; color:#4f46e5; margin:6px 0 16px 0;">${formatTime12(task.startTime)} — ${formatTime12(task.endTime)}</div>
+        <div class="timer-display-box">${timeStr}</div>
+        <div class="timer-button-row">
+          <button class="btn-pause" onclick="togglePauseTimer()">${active.isPaused ? '▶ Resume' : '⏸ Pause'}</button>
+          <button class="btn-finish" onclick="finishActiveStudy()">✓ Complete</button>
+        </div>
+      `;
+    }
+
+    function togglePauseTimer() {
+      if (!appState.activeChallenge) return;
+      const active = appState.activeChallenge;
+      if (active.isPaused) {
+        active.targetEndMs = Date.now() + active.pausedRemainingMs;
+        active.isPaused = false;
+        active.pausedRemainingMs = null;
+      } else {
+        active.pausedRemainingMs = Math.max(0, active.targetEndMs - Date.now());
+        active.isPaused = true;
+      }
+      saveState();
+      renderTimerView();
+    }
+
+    function finishActiveStudy() {
+      if (!appState.activeChallenge) return;
+      const task = appState.tasks.find(t => t.id === appState.activeChallenge.taskId);
+      if (task) task.status = 'COMPLETED';
+
+      appState.activeChallenge = null;
+      saveState();
+      renderTasks();
+      renderTimerView();
+      audio.playComplete();
+      alert("✨ बधाई हो! आपने अपना स्टडी चैलेंज पूरा कर लिया!");
+      switchTab('tasks');
+    }
+
+    /* =========================================================
+       7. TASK LIST & FORM
+       ========================================================= */
+    function renderTasks() {
+      const container = document.getElementById('taskListContainer');
+      document.getElementById('taskStatsPill').textContent = `${appState.tasks.length} Tasks`;
+
+      if (appState.tasks.length === 0) {
+        container.innerHTML = `
+          <div style="background: rgba(255,255,255,0.7); border: 2px dashed rgba(99,102,241,0.25); border-radius: 20px; padding: 36px 20px; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">🎯</div>
+            <div style="font-weight: 800; font-size: 1.05rem;">No Study Tasks Added</div>
+            <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">Click '+ Add Task' below to plan your study session.</div>
+          </div>
+        `;
+        return;
+      }
+
+      appState.tasks.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+      container.innerHTML = appState.tasks.map(task => {
+        let tagClass = 'tag-upcoming', statusLabel = '⏳ UPCOMING', cardClass = '', retryBtn = '';
+        if (task.status === 'ACTIVE') {
+          tagClass = 'tag-active'; statusLabel = '🔵 ACTIVE'; cardClass = 'active-card';
+        } else if (task.status === 'COMPLETED') {
+          tagClass = 'tag-completed'; statusLabel = '🟢 COMPLETED'; cardClass = 'completed-card';
+        } else if (task.status === 'REJECTED') {
+          tagClass = 'tag-rejected'; statusLabel = '🔴 REJECTED'; cardClass = 'rejected-card';
+          retryBtn = `<button class="btn-retry" onclick="retryTask('${task.id}')">↻ Try Again</button>`;
+        }
+
+        return `
+          <div class="task-card ${cardClass}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="subject-pill">${escapeHtml(task.subject)}</span>
+              <span class="task-status-tag ${tagClass}">${statusLabel}</span>
+            </div>
+            <div class="task-topic">${escapeHtml(task.topic)}</div>
+            <div class="task-card-footer">
+              <span>⏰ ${formatTime12(task.startTime)} — ${formatTime12(task.endTime)}</span>
+              ${retryBtn}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAddTaskModal() {
+      audio.init();
+      ensureNotificationPermission();
+      document.getElementById('addTaskModal').classList.add('show');
+    }
+
+    function closeAddTaskModal() {
+      document.getElementById('addTaskModal').classList.remove('show');
+    }
+
+    function handleCreateTask(e) {
+      e.preventDefault();
+      const subject = document.getElementById('formSubject').value;
+      const topic = document.getElementById('formTopic').value.trim();
+      const startTime = document.getElementById('formStartTime').value;
+      const endTime = document.getElementById('formEndTime').value;
+
+      if (!topic || !startTime || !endTime) return;
+
+      appState.tasks.push({
+        id: 'task_' + Date.now(),
+        subject, topic, startTime, endTime,
+        status: 'UPCOMING'
+      });
+
+      saveState();
+      closeAddTaskModal();
+      renderTasks();
+      checkScheduledTasks();
+    }
+
+    function switchTab(tab) {
+      const tabTasks = document.getElementById('tab-tasks');
+      const tabTimer = document.getElementById('tab-timer');
+      const btnTasks = document.getElementById('navBtnTasks');
+      const btnTimer = document.getElementById('navBtnTimer');
+      const floatBtn = document.getElementById('floatingAddBtn');
+
+      if (tab === 'tasks') {
+        tabTasks.style.display = 'block';
+        tabTimer.style.display = 'none';
+        btnTasks.classList.add('active');
+        btnTimer.classList.remove('active');
+        floatBtn.style.display = 'flex';
+        renderTasks();
+      } else {
+        tabTasks.style.display = 'none';
+        tabTimer.style.display = 'block';
+        btnTasks.classList.remove('active');
+        btnTimer.classList.add('active');
+        floatBtn.style.display = 'none';
+        renderTimerView();
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderTasks();
+      startTimerTick();
+
+      if (appState.activeChallenge) switchTab('timer');
+
+      setInterval(checkScheduledTasks, 4000);
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          checkScheduledTasks();
+          renderTimerView();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
